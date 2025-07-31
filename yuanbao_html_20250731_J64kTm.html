@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱心动画 - I LOVE U</title>
+    <style>
+        /* 基础样式设置 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 提示文字 */
+        .click-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 5;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0.7; }
+        }
+        
+        /* 爱心容器 */
+        #hearts-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        /* 爱心元素样式 */
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            color: #ff66b3; /* 粉色爱心 */
+            pointer-events: none;
+            user-select: none;
+            z-index: 2;
+            opacity: 0;
+            animation: heartFloat 6s forwards, fadeInOut 1.5s infinite alternate;
+        }
+        
+        /* 爱心浮动动画 */
+        @keyframes heartFloat {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+        
+        /* 爱心闪烁动画 */
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        /* 文字容器 */
+        #text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        /* I LOVE U 文字样式 */
+        .love-text {
+            font-size: 14vmin; /* 响应式大小 */
+            font-weight: bold;
+            color: #6bd6ff; /* 浅蓝色 */
+            text-shadow: 0 0 20px rgba(107, 214, 255, 0.8);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: textAppear 2s ease-in-out forwards;
+        }
+        
+        /* 文字出现动画 */
+        @keyframes textAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* 文字跳动动画 */
+        @keyframes textPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 添加光环效果 */
+        .halo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50vmax;
+            height: 50vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(107, 214, 255, 0.3) 0%, transparent 70%);
+            z-index: 0;
+            opacity: 0;
+            animation: haloAppear 3s ease-out forwards;
+        }
+        
+        @keyframes haloAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="click-prompt">点击屏幕</div>
+    <div id="hearts-container"></div>
+    <div id="text-container">
+        <div class="halo"></div>
+        <div class="love-text">I LOVE U</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heartsContainer = document.getElementById('hearts-container');
+            const clickPrompt = document.querySelector('.click-prompt');
+            const loveText = document.querySelector('.love-text');
+            
+            // 初始创建一些爱心（但不可见）
+            createHearts(50);
+            
+            // 点击后触发动画
+            document.body.addEventListener('click', () => {
+                // 移除提示
+                clickPrompt.style.display = 'none';
+                
+                // 开始创建大量爱心
+                createHearts(200);
+                
+                // 激活文字动画
+                loveText.style.animation = 'textAppear 2s ease-in-out forwards, textPulse 3s infinite';
+                
+                // 添加光环动画
+                document.querySelector('.halo').style.animation = 'haloAppear 3s ease-out forwards';
+                
+                // 鼠标移动时生成少量爱心
+                document.body.addEventListener('mousemove', (e) => {
+                    createHeartsAtPosition(1, e.clientX, e.clientY);
+                });
+            });
+            
+            // 创建多个爱心
+            function createHearts(count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        createHeart();
+                    }, i * 50); // 错开创建时间
+                }
+            }
+            
+            // 在指定位置创建爱心
+            function createHeartsAtPosition(count, x, y) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        createHeart(x, y);
+                    }, i * 20);
+                }
+            }
+            
+            // 创建单个爱心
+            function createHeart(x, y) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤';
+                heart.classList.add('heart');
+                
+                // 随机大小 (15px - 50px)
+                const size = Math.random() * 35 + 15;
+                heart.style.fontSize = `${size}px`;
+                
+                // 随机位置
+                const posX = x || Math.random() * window.innerWidth;
+                const posY = y || Math.random() * window.innerHeight;
+                heart.style.left = `${posX}px`;
+                heart.style.top = `${posY}px`;
+                
+                // 随机动画延迟和持续时间
+                const delay = Math.random() * 5;
+                const duration = 3 + Math.random() * 3;
+                heart.style.animationDelay = `${delay}s`;
+                heart.style.animationDuration = `${duration}s`;
+                
+                // 随机颜色变化
+                const colorVariation = Math.random() * 50;
+                heart.style.color = `rgb(255, ${102 - colorVariation}, ${179 - colorVariation})`;
+                
+                heartsContainer.appendChild(heart);
+                
+                // 动画结束后移除爱心
+                setTimeout(() => {
+                    heart.remove();
+                }, (duration + delay) * 1000);
+            }
+            
+            // 调整大小时重设爱心位置
+            window.addEventListener('resize', () => {
+                const hearts = document.querySelectorAll('.heart');
+                hearts.forEach(heart => {
+                    heart.style.left = `${Math.random() * window.innerWidth}px`;
+                    heart.style.top = `${Math.random() * window.innerHeight}px`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
